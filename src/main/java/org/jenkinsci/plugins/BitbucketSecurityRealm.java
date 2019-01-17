@@ -15,6 +15,7 @@ import org.acegisecurity.userdetails.UsernameNotFoundException;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.api.BitbucketApiService;
 import org.jenkinsci.plugins.api.BitbucketGroup;
+import org.jenkinsci.plugins.api.BitbucketUser;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Header;
 import org.kohsuke.stapler.HttpRedirect;
@@ -39,6 +40,7 @@ import hudson.security.GroupDetails;
 import hudson.security.SecurityRealm;
 import hudson.security.UserMayOrMayNotExistException;
 import jenkins.model.Jenkins;
+import jenkins.security.SecurityListener;
 
 public class BitbucketSecurityRealm extends SecurityRealm {
 
@@ -129,6 +131,10 @@ public class BitbucketSecurityRealm extends SecurityRealm {
             if (u != null) {
                 u.setFullName(auth.getName());
             }
+
+            BitbucketUser userDetails = new BitbucketUser();
+            userDetails.username = auth.getName();
+            SecurityListener.fireAuthenticated(userDetails);
 
         } else {
             LOGGER.log(Level.SEVERE, "doFinishLogin() accessToken = null");
